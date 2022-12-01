@@ -9,7 +9,6 @@ import Text.Read (readMaybe)
 
 import Solutions.Day1 qualified as D1
 
-
 main :: IO ()
 main = do
     args <- getArgs
@@ -18,7 +17,7 @@ main = do
         Just input -> do
             txtInp <- toTxt <$> readFile (inputFile input)
             case pickSolver input of
-                Nothing -> error $ "Bad combination of day/part: " <>  show input
+                Nothing -> error $ "Bad combination of day/part: " <> show input
                 Just solver -> putTxtLn $ solver txtInp
 
 data Input = Input
@@ -37,8 +36,7 @@ parseArgs = \case
     _ -> Nothing
 
 pickSolver :: Input -> Maybe (Text -> Text)
-pickSolver = \case 
+pickSolver = \case
     Input 1 1 _ -> Just (D1.solve1)
     Input 1 2 _ -> Just (D1.solve2)
-
     _ -> Nothing

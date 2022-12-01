@@ -1,12 +1,10 @@
--- | Alternative prelude.
---
--- Add imports here for things used often.
+{- | Alternative prelude.
 
+ Add imports here for things used often.
+-}
 module Prelube (
     module PreludeLess,
-
     module Prelube,
-
     module Data.Char,
     module Data.Coerce,
     module Data.List.NonEmpty,
@@ -16,10 +14,7 @@ module Prelube (
     module Debug.Pretty.Simple,
 ) where
 
-
-
 import Prelude as PreludeLess hiding (
-    (!!),
     break,
     cycle,
     drop,
@@ -45,12 +40,13 @@ import Prelude as PreludeLess hiding (
     unzip,
     zip,
     zipWith,
+    (!!),
  )
 
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
-import Data.Maybe (fromMaybe)
 import Data.List.NonEmpty
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
