@@ -4,6 +4,7 @@ module Main (
 
 import Prelube
 
+import System.Environment (getArgs)
 import Text.Read (readMaybe)
 
 import Solutions.Day1 qualified as D1
@@ -11,8 +12,8 @@ import Solutions.Day1 qualified as D1
 
 main :: IO ()
 main = do
-    inp <- getLine  -- TODO: replace with some option parsing library
-    case parseInput inp of
+    args <- getArgs
+    case parseArgs args of
         Nothing -> error "Could not parse input."
         Just input -> do
             txtInp <- toTxt <$> readFile (inputFile input)
@@ -27,12 +28,13 @@ data Input = Input
     }
     deriving (Eq, Show)
 
-parseInput :: String -> Maybe Input
-parseInput s = do
-    [dayStr, partStr, fpStr] <- pure $ words s
-    day <- readMaybe dayStr
-    part <- readMaybe partStr
-    pure (Input day part fpStr)
+parseArgs :: [String] -> Maybe Input
+parseArgs = \case
+    [dayStr, partStr, fpStr] -> do
+        day <- readMaybe dayStr
+        part <- readMaybe partStr
+        pure (Input day part fpStr)
+    _ -> Nothing
 
 pickSolver :: Input -> Maybe (Text -> Text)
 pickSolver = \case 
