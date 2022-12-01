@@ -1,1 +1,5 @@
+# Cabal build files.
 dist-newstyle/
+
+# AoC author asks people to not upload inputs.
+inputs/
