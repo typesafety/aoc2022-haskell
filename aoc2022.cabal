@@ -1,0 +1,91 @@
+cabal-version: 3.4
+name: aoc2022
+version: 0.1.0.0
+synopsis: Advent of Code 2022 solutions
+description: Solutions for Advent of Code 2022
+homepage: https://github.com/typesafety/aoc2022
+license: MIT
+license-file: LICENSE
+author: Thomas Li
+maintainer: ailoodee@gmail.com
+build-type: Simple
+
+common warnings
+    ghc-options:
+        -Wall
+
+common extensions
+    default-extensions:
+        ImportQualifiedPost
+        LambdaCase
+        NoImplicitPrelude
+        OverloadedLists
+        OverloadedStrings
+        TupleSections
+
+library
+    import:
+        extensions,
+        warnings,
+
+    exposed-modules:
+        Prelube
+        Solutions.Day1
+
+    other-modules:
+
+    build-depends:
+        base ^>= 4.17.0.0,
+
+        pretty-simple,
+        text,
+
+    hs-source-dirs:
+        src
+
+    default-language: GHC2021
+
+executable aoc2022
+    import:
+        extensions,
+        warnings,
+
+    main-is: Main.hs
+
+    other-modules:
+
+    other-extensions:
+
+    build-depends:
+        base ^>= 4.17.0.0,
+        aoc2022,
+
+    hs-source-dirs:
+        app
+
+    default-language: GHC2021
+
+test-suite aoc2022-test
+    import:
+        extensions,
+        warnings,
+
+    default-language: GHC2021
+
+    other-modules:
+
+    other-extensions:
+
+    type: exitcode-stdio-1.0
+
+    hs-source-dirs:
+        test
+
+    main-is: Main.hs
+
+    -- Test dependencies.
+    build-depends:
+        base ^>=4.17.0.0,
+        aoc2022,
+
+        text,
