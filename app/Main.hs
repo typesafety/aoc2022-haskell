@@ -7,8 +7,8 @@ import Prelube
 import System.Environment (getArgs)
 import Text.Read (readMaybe)
 
-import Solutions.Day1 qualified as D1
-import Solutions.Day2 qualified as D2
+import Solutions.Day01 qualified as D1
+import Solutions.Day02 qualified as D2
 
 main :: IO ()
 main = do

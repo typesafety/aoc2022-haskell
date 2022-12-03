@@ -32,8 +32,8 @@ library
 
     exposed-modules:
         Prelube
-        Solutions.Day1
-        Solutions.Day2
+        Solutions.Day01
+        Solutions.Day02
 
     other-modules:
 

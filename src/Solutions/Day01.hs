@@ -1,4 +1,4 @@
-module Solutions.Day1 where
+module Solutions.Day01 where
 
 import Prelube
 
