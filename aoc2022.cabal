@@ -1,14 +1,14 @@
-cabal-version: 3.4
-name: aoc2022
-version: 0.1.0.0
-synopsis: Advent of Code 2022 solutions
-description: Solutions for Advent of Code 2022
-homepage: https://github.com/typesafety/aoc2022
-license: MIT
-license-file: LICENSE
-author: Thomas Li
-maintainer: ailoodee@gmail.com
-build-type: Simple
+cabal-version:   3.4
+name:            aoc2022
+version:         0.1.0.0
+synopsis:        Advent of Code 2022 solutions
+description:     Solutions for Advent of Code 2022
+homepage:        https://github.com/typesafety/aoc2022
+license:         MIT
+license-file:    LICENSE
+author:          Thomas Li
+maintainer:      ailoodee@gmail.com
+build-type:      Simple
 
 common warnings
     ghc-options:
@@ -40,9 +40,13 @@ library
     build-depends:
         base ^>= 4.17.0.0,
 
+        -- For parsing the puzzle input.
         megaparsec,
+        -- For easy prettyprinting.
         pretty-simple,
+        -- Text > String.
         text,
+        -- Show for Text.
         text-show,
 
     hs-source-dirs:
@@ -64,8 +68,6 @@ executable aoc2022
     build-depends:
         base ^>= 4.17.0.0,
         aoc2022,
-
-        text-show,
 
     hs-source-dirs:
         app
