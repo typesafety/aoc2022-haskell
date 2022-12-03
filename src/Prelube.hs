@@ -6,6 +6,7 @@ module Prelube (
     module PreludeLess,
     module Prelube,
     module Control.Applicative,
+    module Data.Bifunctor,
     module Data.Char,
     module Data.Coerce,
     module Data.Kind,
@@ -49,6 +50,7 @@ import Prelude as PreludeLess hiding (
 import Control.Applicative ((<|>))
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
+import Data.Bifunctor
 import Data.Kind (Type)
 import Data.List.NonEmpty
 import Data.Maybe (fromMaybe)
@@ -80,7 +82,7 @@ data SolverResult :: Type where
 showtSR :: SolverResult -> Text
 showtSR (SR t) = showt t
 
--- * Parsing
+-- * Parsing and plumbing
 
 -- TODO: output error message on parse fail
 partialParseText :: HasCallStack => P.Parsec Void Text b -> Text -> b
@@ -90,6 +92,11 @@ partialNonEmpty :: HasCallStack => [a] -> NonEmpty a
 partialNonEmpty xs = case nonEmpty xs of
     Just ys -> ys
     Nothing -> error "partialNonEmpty: empty list"
+
+partialFromJust :: HasCallStack => Maybe a -> a
+partialFromJust = \case
+    Just x -> x
+    Nothing -> error "partialFromJust: Nothing"
 
 -- * Working with Text
 
@@ -101,6 +108,11 @@ toTxt = Txt.pack
 
 toStr :: Text -> String
 toStr = Txt.unpack
+
+-- * Bifunctor
+
+both :: Bifunctor p => (a -> b) -> p a a -> p b b
+both f = bimap f f
 
 -- * Misc
 

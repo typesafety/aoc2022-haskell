@@ -17,6 +17,8 @@ common warnings
 common extensions
     default-extensions:
         AllowAmbiguousTypes
+        DerivingStrategies
+        DerivingVia
         DuplicateRecordFields
         ImportQualifiedPost
         LambdaCase
