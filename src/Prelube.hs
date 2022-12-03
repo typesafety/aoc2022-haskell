@@ -6,6 +6,7 @@ module Prelube (
     module PreludeLess,
     module Prelube,
     module Control.Applicative,
+    module Control.Monad,
     module Data.Bifunctor,
     module Data.Char,
     module Data.Coerce,
@@ -48,6 +49,7 @@ import Prelude as PreludeLess hiding (
  )
 
 import Control.Applicative ((<|>))
+import Control.Monad ((>=>), (<=<))
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
 import Data.Bifunctor
