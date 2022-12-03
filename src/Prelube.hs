@@ -5,13 +5,16 @@
 module Prelube (
     module PreludeLess,
     module Prelube,
+    module Control.Applicative,
     module Data.Char,
     module Data.Coerce,
+    module Data.Kind,
     module Data.List.NonEmpty,
     module Data.Maybe,
     module Data.Text,
     module Data.Void,
     module Debug.Pretty.Simple,
+    module TextShow,
 ) where
 
 import Prelude as PreludeLess hiding (
@@ -43,14 +46,18 @@ import Prelude as PreludeLess hiding (
     (!!),
  )
 
+import Control.Applicative ((<|>))
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
+import Data.Kind (Type)
 import Data.List.NonEmpty
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
 import Data.Void (Void)
+import Unsafe.Coerce (unsafeCoerce)
+
 import Debug.Pretty.Simple (
     pTrace,
     pTraceIO,
@@ -62,10 +69,20 @@ import Debug.Pretty.Simple (
  )
 import GHC.Stack (HasCallStack)
 import Text.Megaparsec qualified as P
-import Unsafe.Coerce (unsafeCoerce)
+import TextShow hiding (singleton)
+
+-- * Glue
+
+data SolverResult :: Type where
+    SR :: TextShow a => a -> SolverResult
+
+-- | Convert a showtSR to a Text.
+showtSR :: SolverResult -> Text
+showtSR (SR t) = showt t
 
 -- * Parsing
 
+-- TODO: output error message on parse fail
 partialParseText :: HasCallStack => P.Parsec Void Text b -> Text -> b
 partialParseText p = fromMaybe (error "partialParseText: failed parse") . P.parseMaybe p
 

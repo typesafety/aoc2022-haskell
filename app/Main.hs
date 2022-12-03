@@ -8,6 +8,7 @@ import System.Environment (getArgs)
 import Text.Read (readMaybe)
 
 import Solutions.Day1 qualified as D1
+import Solutions.Day2 qualified as D2
 
 main :: IO ()
 main = do
@@ -18,7 +19,7 @@ main = do
             txtInp <- toTxt <$> readFile (inputFile input)
             case pickSolver input of
                 Nothing -> error $ "Bad combination of day/part: " <> show input
-                Just solver -> putTxtLn $ solver txtInp
+                Just solver -> putTxtLn . showtSR . solver $ txtInp
 
 data Input = Input
     { inputDay :: Int
@@ -35,8 +36,10 @@ parseArgs = \case
         pure (Input day part fpStr)
     _ -> Nothing
 
-pickSolver :: Input -> Maybe (Text -> Text)
+pickSolver :: Input -> Maybe (Text -> SolverResult)
 pickSolver = \case
     Input 1 1 _ -> Just (D1.solve1)
     Input 1 2 _ -> Just (D1.solve2)
+    Input 2 1 _ -> Just (D2.solve1)
+    Input 2 2 _ -> Just (D2.solve2)
     _ -> Nothing

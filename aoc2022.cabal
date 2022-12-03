@@ -16,10 +16,12 @@ common warnings
 
 common extensions
     default-extensions:
+        DuplicateRecordFields
         ImportQualifiedPost
         LambdaCase
         NoImplicitPrelude
         OverloadedLists
+        OverloadedRecordDot
         OverloadedStrings
         TupleSections
 
@@ -31,6 +33,7 @@ library
     exposed-modules:
         Prelube
         Solutions.Day1
+        Solutions.Day2
 
     other-modules:
 
@@ -40,6 +43,7 @@ library
         megaparsec,
         pretty-simple,
         text,
+        text-show,
 
     hs-source-dirs:
         src
@@ -60,6 +64,8 @@ executable aoc2022
     build-depends:
         base ^>= 4.17.0.0,
         aoc2022,
+
+        text-show,
 
     hs-source-dirs:
         app
