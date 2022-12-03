@@ -16,6 +16,7 @@ common warnings
 
 common extensions
     default-extensions:
+        AllowAmbiguousTypes
         DuplicateRecordFields
         ImportQualifiedPost
         LambdaCase
@@ -24,6 +25,7 @@ common extensions
         OverloadedRecordDot
         OverloadedStrings
         TupleSections
+        TypeFamilies
 
 library
     import:
@@ -34,6 +36,7 @@ library
         Prelube
         Solutions.Day01
         Solutions.Day02
+        Solutions.Day02v2
 
     other-modules:
 
