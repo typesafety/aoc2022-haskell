@@ -9,6 +9,7 @@ import Text.Read (readMaybe)
 
 import Solutions.Day01 qualified as D1
 import Solutions.Day02 qualified as D2
+import Solutions.Day03 qualified as D3
 
 main :: IO ()
 main = do
@@ -42,4 +43,6 @@ pickSolver = \case
     Input 1 2 _ -> Just (D1.solve2)
     Input 2 1 _ -> Just (D2.solve1)
     Input 2 2 _ -> Just (D2.solve2)
+    Input 3 1 _ -> Just (D3.solve1)
+    Input 3 2 _ -> Just (D3.solve2)
     _ -> Nothing

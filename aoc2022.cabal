@@ -36,7 +36,7 @@ library
         Prelube
         Solutions.Day01
         Solutions.Day02
-        Solutions.Day02v2
+        Solutions.Day03
 
     other-modules:
 
