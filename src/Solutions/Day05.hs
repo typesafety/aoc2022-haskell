@@ -27,25 +27,34 @@ solve2 = SR
     . uncurry (flip (steps move2))
     . partialParseText inputP
 
-steps :: (Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])) -> [Instruction] -> IntMap [Crate] -> Maybe (IntMap [Crate])
+-- | How to move n crates from one stack to another.
+type MoveStrategy = Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
+
+-- | Perform the actions of multiple instructions.
+steps :: MoveStrategy -> [Instruction] -> IntMap [Crate] -> Maybe (IntMap [Crate])
 steps moveStrat instructions im = case instructions of
     []     -> Just im
     i : is -> step moveStrat i im >>= steps moveStrat is
 
-step :: (Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])) -> Instruction -> IntMap [Crate] -> Maybe (IntMap [Crate])
+-- | Perform the action of one instruction
+step :: MoveStrategy -> Instruction -> IntMap [Crate] -> Maybe (IntMap [Crate])
 step moveStrat instr im = do
     from <- IM.lookup instr.from im
     to <- IM.lookup instr.to im
     (newFrom, newTo) <- moveStrat instr.count from to
     pure . IM.insert instr.to newTo . IM.insert instr.from newFrom $ im
 
-move1 :: Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
+-- | CrateMover 9000.
+move1 :: MoveStrategy
 move1 0 from to = Just (from, to)
 move1 count (f : from) to = move1 (count - 1) from (f : to)
 move1 _ [] _ = Nothing
 
-move2 :: Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
+-- | CrateMover 9001.
+move2 :: MoveStrategy
 move2 count from to = Just (List.drop count from, List.take count from <> to)
+
+-- * Data types and parsing
 
 type Parser = P.Parsec Void Text
 
