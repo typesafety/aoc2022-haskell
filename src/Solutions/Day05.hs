@@ -14,32 +14,38 @@ import Text.Megaparsec.Char.Lexer qualified as Lex
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
 solve1 = SR
-    . IM.foldl (\acc xs -> acc <> ((maybe "" ((: "")  . unCrate)  . listToMaybe) xs)) "" 
-    . partialFromJust 
-    . uncurry (flip steps) 
+    . IM.foldl (\acc xs -> acc <> ((maybe "" ((: "")  . unCrate)  . listToMaybe) xs)) ""
+    . partialFromJust
+    . uncurry (flip (steps move1))
     . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . IM.foldl (\acc xs -> acc <> ((maybe "" ((: "")  . unCrate)  . listToMaybe) xs)) ""
+    . partialFromJust
+    . uncurry (flip (steps move2))
+    . partialParseText inputP
 
-steps :: [Instruction] -> IntMap [Crate] -> Maybe (IntMap [Crate])
-steps instructions im = case instructions of
+steps :: (Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])) -> [Instruction] -> IntMap [Crate] -> Maybe (IntMap [Crate])
+steps moveStrat instructions im = case instructions of
     []     -> Just im
-    i : is -> step i im >>= steps is
+    i : is -> step moveStrat i im >>= steps moveStrat is
 
-step :: Instruction -> IntMap [Crate] -> Maybe (IntMap [Crate])
-step instr im = do
+step :: (Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])) -> Instruction -> IntMap [Crate] -> Maybe (IntMap [Crate])
+step moveStrat instr im = do
     from <- IM.lookup instr.from im
     to <- IM.lookup instr.to im
-    (newFrom, newTo) <- move instr.count from to
+    (newFrom, newTo) <- moveStrat instr.count from to
     pure . IM.insert instr.to newTo . IM.insert instr.from newFrom $ im
 
-move :: Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
-move 0 from to = Just (from, to)
-move count (f : from) to = move (count - 1) from (f : to)
-move _ [] _ = Nothing
-    
+move1 :: Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
+move1 0 from to = Just (from, to)
+move1 count (f : from) to = move1 (count - 1) from (f : to)
+move1 _ [] _ = Nothing
+
+move2 :: Int -> [Crate] -> [Crate] -> Maybe ([Crate], [Crate])
+move2 count from to = Just (List.drop count from, List.take count from <> to)
 
 type Parser = P.Parsec Void Text
 
