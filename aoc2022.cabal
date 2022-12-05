@@ -39,12 +39,15 @@ library
         Solutions.Day01
         Solutions.Day02
         Solutions.Day03
+        Solutions.Day05
 
     other-modules:
 
     build-depends:
         base ^>= 4.17.0.0,
 
+        -- Imagine having useful data structures in base lol
+        containers,
         -- For parsing the puzzle input.
         megaparsec,
         -- For easy prettyprinting.

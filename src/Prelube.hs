@@ -10,6 +10,7 @@ module Prelube (
     module Data.Bifunctor,
     module Data.Char,
     module Data.Coerce,
+    module Data.IntMap.Strict,
     module Data.Kind,
     module Data.List.NonEmpty,
     module Data.Maybe,
@@ -50,12 +51,13 @@ import Prelude as PreludeLess hiding (
 
 import Control.Applicative ((<|>))
 import Control.Monad ((>=>), (<=<))
+import Data.Bifunctor
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
-import Data.Bifunctor
+import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
 import Data.List.NonEmpty
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isJust)
 import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
