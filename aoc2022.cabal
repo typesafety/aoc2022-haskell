@@ -40,6 +40,7 @@ library
         Solutions.Day02
         Solutions.Day03
         Solutions.Day05
+        Solutions.Day07
 
     other-modules:
 

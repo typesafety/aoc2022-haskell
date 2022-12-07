@@ -14,6 +14,7 @@ module Prelube (
     module Data.Kind,
     module Data.List.NonEmpty,
     module Data.Maybe,
+    module Data.Sequence,
     module Data.Text,
     module Data.Void,
     module Debug.Pretty.Simple,
@@ -58,6 +59,7 @@ import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
 import Data.List.NonEmpty
 import Data.Maybe (fromMaybe, isJust)
+import Data.Sequence (Seq)
 import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
