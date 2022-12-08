@@ -7,9 +7,12 @@ module Prelube (
     module Prelube,
     module Control.Applicative,
     module Control.Monad,
+    module Control.Monad.State.Strict,
     module Data.Bifunctor,
     module Data.Char,
     module Data.Coerce,
+    module Data.HashMap.Strict,
+    module Data.Functor,
     module Data.IntMap.Strict,
     module Data.Kind,
     module Data.List.NonEmpty,
@@ -52,14 +55,17 @@ import Prelude as PreludeLess hiding (
 
 import Control.Applicative ((<|>))
 import Control.Monad ((>=>), (<=<))
+import Control.Monad.State.Strict (State)
 import Data.Bifunctor
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
+import Data.Functor ((<&>))
+import Data.HashMap.Strict (HashMap)
 import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
-import Data.List.NonEmpty
+import Data.List.NonEmpty hiding ((<|))
 import Data.Maybe (fromMaybe, isJust)
-import Data.Sequence (Seq)
+import Data.Sequence (Seq(..), (<|), (|>))
 import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt

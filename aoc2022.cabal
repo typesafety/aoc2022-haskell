@@ -49,14 +49,22 @@ library
 
         -- Imagine having useful data structures in base lol
         containers,
+        -- For the Hashable class and instances.
+        hashable,
+        -- Records.
+        lens,
         -- For parsing the puzzle input.
         megaparsec,
+        -- The usual suspects.
+        mtl,
         -- For easy prettyprinting.
         pretty-simple,
         -- Text > String.
         text,
         -- Show for Text.
         text-show,
+        -- Imagine hash maps being in contaiers lol
+        unordered-containers,
 
     hs-source-dirs:
         src
