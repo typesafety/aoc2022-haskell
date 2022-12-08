@@ -7,11 +7,12 @@ import Prelube
 import Control.Lens.Combinators qualified as L
 import Control.Lens.TH qualified as LensTH
 import Control.Monad (forM_)
-import Control.Monad.State.Strict (gets, put, modify')
+import Control.Monad.State.Strict (gets, modify')
 import Control.Monad.State.Strict qualified as State
 import Data.Foldable qualified as Foldable
 import Data.HashMap.Strict qualified as HM
 import Data.Hashable (Hashable)
+import Data.List qualified as List
 import Data.Sequence qualified as Seq
 
 
@@ -62,7 +63,7 @@ data Env = Env
 $(LensTH.makeLenses ''Env)
 
 getSizes :: Env -> Sizes
-getSizes env = State.execState (fill env) (HM.empty)
+getSizes env = State.execState fill (HM.empty)
   where
     dmap :: DirMap
     dmap = L.view envMap env
@@ -70,8 +71,8 @@ getSizes env = State.execState (fill env) (HM.empty)
     sortedPaths :: Seq Path
     sortedPaths = Seq.sortOn (Seq.length . unPath) (Seq.fromList (HM.keys dmap))
 
-    fill :: Env -> State Sizes ()
-    fill e = do
+    fill :: State Sizes ()
+    fill = do
         forM_ sortedPaths $ \p -> do
             s <- getDirSize p
             modify' (HM.insert p s)
@@ -201,8 +202,25 @@ fileEntryP = do
 
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = SR . HM.foldl' (+) 0 . HM.filter (<= 100_000) . getSizes . buildStructure . partialParseText inputP
+solve1 = SR
+    . HM.foldl' (+) 0
+    . HM.filter (<= 100_000)
+    . getSizes
+    . buildStructure
+    . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . List.head
+    . List.sort
+    . HM.elems
+    . (\sizeMap -> HM.filter (>= amountToDelete sizeMap) sizeMap)
+    . getSizes
+    . buildStructure
+    . partialParseText inputP
+  where
+    amountToDelete :: Sizes -> Int
+    amountToDelete sizeMap = 30_000_000 - (70_000_000 - (sizeMap HM.! (Path [])))
+
+    
