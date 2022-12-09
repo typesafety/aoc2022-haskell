@@ -54,7 +54,7 @@ import Prelude as PreludeLess hiding (
  )
 
 import Control.Applicative ((<|>))
-import Control.Monad ((>=>), (<=<))
+import Control.Monad ((>=>), (<=<), when)
 import Control.Monad.State.Strict (State)
 import Data.Bifunctor
 import Data.Char (digitToInt)
@@ -63,6 +63,7 @@ import Data.Functor ((<&>))
 import Data.HashMap.Strict (HashMap)
 import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
+import Data.List qualified as List
 import Data.List.NonEmpty hiding ((<|))
 import Data.Maybe (fromMaybe, isJust)
 import Data.Sequence (Seq(..), (<|), (|>))
@@ -109,6 +110,11 @@ partialFromJust :: HasCallStack => Maybe a -> a
 partialFromJust = \case
     Just x -> x
     Nothing -> error "partialFromJust: Nothing"
+
+partialHead :: HasCallStack => [a] -> a
+partialHead = \case
+    [] -> error "partialHead: empty list"
+    xs -> List.head xs
 
 -- * Working with Text
 
