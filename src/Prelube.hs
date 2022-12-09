@@ -116,6 +116,11 @@ partialHead = \case
     [] -> error "partialHead: empty list"
     xs -> List.head xs
 
+partialLast :: HasCallStack => [a] -> a
+partialLast = \case
+    [] -> error "partialLast: empty list"
+    xs -> List.last xs
+
 -- * Working with Text
 
 putTxtLn :: Text -> IO ()

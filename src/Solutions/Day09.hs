@@ -32,25 +32,53 @@ initEnv1 = Env
     , _envVisited = HS.singleton (0, 0)
     }
 
-runMotions :: [Motion] -> Env
-runMotions motions = State.execState (steps motions) initEnv1
+initEnv2 :: Env
+initEnv2 = Env
+    { _envHead = (0, 0)
+    , _envTails = replicate 9 (0, 0)
+    , _envVisited = HS.singleton (0, 0)
+    }
+
+runMotions :: [Motion] -> Env -> Env
+runMotions motions = State.execState (steps motions)
   where
     steps :: [Motion] -> State Env ()
     steps [] = pure ()
     steps (m : ms) = do
-
-        oldHead <- L.use envHead
         _ <- stepHead m
         newHead <- L.use envHead
 
-        tailLoc <- partialHead <$> L.use envTails
+        oldTails <- L.use envTails
+        newTails <- moveTails oldTails newHead
 
-        let areTouching = tailLoc `touching` newHead
-        when (not areTouching) $ do
-            L.modifying envVisited (HS.insert oldHead)
-            L.modifying envTails (const [oldHead])
+        L.assign envTails newTails
+        L.modifying envVisited (HS.insert (partialLast newTails))
 
         steps ms
+
+    moveTails :: [(Int, Int)] -> (Int, Int) -> State Env [(Int, Int)]
+    moveTails [] _ = pure []
+    moveTails (t : ts) inFront = do
+        let newLoc = t `moveToward` inFront
+        rest <- moveTails ts newLoc
+        pure $ newLoc : rest
+
+    moveToward :: (Int, Int) -> (Int, Int) -> (Int, Int)
+    moveToward me@(x, y) target@(tx, ty)
+        | me `touching` target = me
+        | x == tx && y < ty = (x, y + 1)
+        | x == tx && y > ty = (x, y - 1)
+
+        | y == ty && x < tx = (x + 1, y)
+        | y == ty && x > tx = (x - 1, y)
+
+        | x > tx && y > ty = (x - 1, y - 1)
+        | x > tx && y < ty = (x - 1, y + 1)
+
+        | x < tx && y > ty = (x + 1, y - 1)
+        | x < tx && y < ty = (x + 1, y + 1)
+
+        | otherwise = error "FUCK"
 
 stepHead :: Motion -> State Env ()
 stepHead m = do
@@ -97,8 +125,16 @@ motionP = do
 
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = SR . HS.size . L.view envVisited . runMotions . partialParseText inputP
+solve1 = SR
+    . HS.size
+    . L.view envVisited
+    . flip runMotions initEnv1
+    . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . HS.size
+    . L.view envVisited
+    . flip runMotions initEnv2
+    . partialParseText inputP
