@@ -5,6 +5,7 @@ module Solutions.Day11 where
 import Prelube
 
 import Control.Lens.Combinators qualified as L
+import Control.Lens.Operators ((^.))
 import Control.Lens.TH qualified as LensTH
 import Control.Monad.State.Strict qualified as State
 import Data.IntMap.Strict qualified as IM
@@ -19,33 +20,23 @@ data Monkey = Monkey
     { _monkeyId :: Int
     , _monkeyItems :: Seq Int
     , _monkeyOp :: Int -> Int
-    , _monkeyTest :: Int -> Bool
-    , _monkeyTrue :: Int
-    , _monkeyFalse :: Int
+    , _monkeyTargeter :: Int -> Int
     , _monkeyCount :: Int
     }
 $(LensTH.makeLenses ''Monkey)
 
-makeMonkey :: Int -> Seq Int -> (Int -> Int) -> (Int -> Bool) -> Int -> Int -> Monkey
-makeMonkey identity startItems operation test trueTarget falseTarget =
+makeMonkey :: Int -> Seq Int -> (Int -> Int) -> (Int -> Int) -> Monkey
+makeMonkey identity startItems operation targetFunc =
     Monkey {
         _monkeyId = identity,
         _monkeyItems = startItems,
         _monkeyOp = operation,
-        _monkeyTest = test,
-        _monkeyTrue = trueTarget,
-        _monkeyFalse = falseTarget,
+        _monkeyTargeter = targetFunc,
         _monkeyCount = 0
     }
     
 instance Show Monkey where
-    show m = mconcat
-        [ "Monkey "
-        , "T=", show (L.view monkeyTrue m), " "
-        , "F=", show (L.view monkeyFalse m), " "
-        , "| "
-        , show (L.view monkeyItems m), " "
-        ]
+    show m = mconcat ["Monkey (", show (m ^. monkeyCount), "): ", show (m ^. monkeyItems)]
 
 -- * Parsing
 
@@ -130,20 +121,39 @@ monkeyP = do
     true <- targetP True
     false <- targetP False
 
-    pure (makeMonkey ident items op test true false)
+    pure (makeMonkey ident items op (\n -> if test n then true else false))
 
 inputP :: Parser (IntMap Monkey)
 inputP = do
     monkeys <- P.sepBy1 monkeyP P.eol
     _ <- P.eof
-
     pure $ IM.fromList $ fmap (\m -> (L.view monkeyId m, m)) monkeys
+
+runRound :: IntMap Monkey -> IntMap Monkey
+runRound monkeys = State.execState (mapM_ takeTurn (IM.keys monkeys)) monkeys
+ 
+takeTurn :: Int -> State (IntMap Monkey) ()
+takeTurn monkeyIdent = do
+    m <- State.gets (IM.! monkeyIdent)
+    forM_ (m ^. monkeyItems) $ \item -> do
+        L.modifying (L.ix monkeyIdent . monkeyCount) (+ 1)
+        inspect item (m ^. monkeyOp) (m ^. monkeyTargeter)
+    L.assign (L.ix monkeyIdent . monkeyItems) []
+
+inspect :: Int -> (Int -> Int) -> (Int -> Int) -> State (IntMap Monkey) ()
+inspect item op targeter = do
+    let newItem = op item `div` 3
+    let target = targeter newItem
+    L.modifying (L.ix target . monkeyItems) (|> newItem)
+
+monkeyBusiness :: IntMap Monkey -> Int
+monkeyBusiness = product . Seq.take 2 . Seq.sortBy (flip compare) . IM.foldl' (\acc m -> m ^. monkeyCount <| acc) []
 
 -- * Solvers
 
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = todo
+solve1 = SR . monkeyBusiness . applyN 20 runRound . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult

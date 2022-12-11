@@ -54,7 +54,7 @@ import Prelude as PreludeLess hiding (
  )
 
 import Control.Applicative ((<|>))
-import Control.Monad ((>=>), (<=<), when)
+import Control.Monad ((>=>), (<=<), when, forM_)
 import Control.Monad.State.Strict (State)
 import Data.Bifunctor
 import Data.Char (digitToInt)
@@ -138,6 +138,12 @@ both :: Bifunctor p => (a -> b) -> p a a -> p b b
 both f = bimap f f
 
 -- * Misc
+
+-- | Apply a function N times.
+applyN :: Int -> (a -> a) -> a -> a
+applyN n f = List.foldl' (.) id (replicate n f)
+
+-- * Placeholders
 
 {-# WARNING todo "Unhandled TODO placeholder expression." #-}
 todo :: HasCallStack => a
