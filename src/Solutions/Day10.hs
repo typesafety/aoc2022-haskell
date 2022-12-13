@@ -7,7 +7,11 @@ import Prelube
 import Control.Lens.Combinators qualified as L
 import Control.Lens.Operators ((^.))
 import Control.Lens.TH qualified as LensTH
+import Control.Monad.State.Strict qualified as State
+import Data.Foldable qualified as Foldable
 import Data.List qualified as List
+import Data.Sequence qualified as Seq
+import System.IO.Unsafe (unsafePerformIO)
 
 import Text.Megaparsec qualified as P
 import Text.Megaparsec.Char qualified as P
@@ -64,10 +68,58 @@ tick env
                 Noop   -> (0, 0)
         in Env newX sleep t pending
 
+newtype Screen = Screen { unScreen :: (Seq (Seq Pixel)) }
+    deriving (Eq, Show)
+
+initScreen :: Screen
+initScreen = Screen (Seq.replicate 6 (Seq.replicate 40 Dark))
+
+data Pixel = Lit | Dark
+    deriving (Eq, Show)
+
+toChar :: Pixel -> Char
+toChar = \case
+    Lit  -> '#'
+    Dark -> '.'
+
+renderScreen :: Screen -> String
+renderScreen =
+    Foldable.foldl' (\acc s -> acc <> s) ""
+    . fmap (Foldable.toList . (|> '\n') . fmap toChar)
+    . unScreen
+
+drawOne :: Int -> Int -> Screen -> Screen
+drawOne x cyc screen@(Screen s)
+    | ix `elem` ([x - 1 .. x + 1] :: [Int]) = Screen $ L.set (L.ix row . L.ix ix) Lit s
+    | otherwise = screen
+  where
+    row :: Int
+    row = cyc `div` 40
+
+    ix :: Int
+    ix = cyc `mod` 40
+
+drawAll :: [Instr] -> Screen
+drawAll instrs = State.execState (go 0 (Env 1 0 instrs 0)) initScreen
+  where
+    go :: Int -> Env -> State Screen ()
+    go 240 _   = pure ()
+    go cyc env = do
+        let newEnv = tick env
+        State.modify' (drawOne (newEnv ^. envX) cyc)
+        go (cyc + 1) newEnv
+
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = SR . sum . signalStrengthsAt [20, 60, 100, 140, 180, 220] . partialParseText inputP
+solve1 = SR
+    . sum
+    . signalStrengthsAt [20, 60, 100, 140, 180, 220]
+    . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . (\s -> flip seq '!' $ unsafePerformIO (putStrLn s))
+    . renderScreen
+    . drawAll
+    . partialParseText inputP
