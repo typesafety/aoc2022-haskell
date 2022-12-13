@@ -54,7 +54,7 @@ import Prelude as PreludeLess hiding (
  )
 
 import Control.Applicative ((<|>))
-import Control.Monad ((>=>), (<=<), when, forM_)
+import Control.Monad ((>=>), (<=<), when, forM_, void, replicateM_)
 import Control.Monad.State.Strict (State)
 import Data.Bifunctor
 import Data.Char (digitToInt)
@@ -142,6 +142,10 @@ both f = bimap f f
 -- | Apply a function N times.
 applyN :: Int -> (a -> a) -> a -> a
 applyN n f = List.foldl' (.) id (replicate n f)
+
+-- | n - 1
+decr :: Int -> Int
+decr n = n - 1
 
 -- * Placeholders
 

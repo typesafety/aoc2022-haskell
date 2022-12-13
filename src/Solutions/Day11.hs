@@ -147,7 +147,11 @@ inspect item op targeter = do
     L.modifying (L.ix target . monkeyItems) (|> newItem)
 
 monkeyBusiness :: IntMap Monkey -> Int
-monkeyBusiness = product . Seq.take 2 . Seq.sortBy (flip compare) . IM.foldl' (\acc m -> m ^. monkeyCount <| acc) []
+monkeyBusiness =
+    product
+    . Seq.take 2
+    . Seq.sortBy (flip compare)
+    . IM.foldl' (\acc m -> m ^. monkeyCount <| acc) []
 
 -- * Solvers
 

@@ -13,6 +13,7 @@ import Solutions.Day03 qualified as D3
 import Solutions.Day05 qualified as D5
 import Solutions.Day07 qualified as D7
 import Solutions.Day09 qualified as D9
+import Solutions.Day10 qualified as D10
 import Solutions.Day11 qualified as D11
 
 
@@ -56,6 +57,8 @@ pickSolver = \case
     Input 7 2 _ -> Just (D7.solve2)
     Input 9 1 _ -> Just (D9.solve1)
     Input 9 2 _ -> Just (D9.solve2)
+    Input 10 1 _ -> Just (D10.solve1)
+    Input 10 2 _ -> Just (D10.solve2)
     Input 11 1 _ -> Just (D11.solve1)
     Input 11 2 _ -> Just (D11.solve2)
     _ -> Nothing

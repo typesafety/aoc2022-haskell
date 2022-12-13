@@ -42,6 +42,7 @@ library
         Solutions.Day05
         Solutions.Day07
         Solutions.Day09
+        Solutions.Day10
         Solutions.Day11
 
     other-modules:
