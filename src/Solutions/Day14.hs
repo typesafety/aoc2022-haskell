@@ -50,12 +50,12 @@ makeWalls (h :| hs) = go h hs
 allWalls :: [NonEmpty (Int, Int)] -> Walls
 allWalls = foldl' (\walls points -> makeWalls points <> walls) HS.empty
 
-dropUntilDone :: Walls -> Sands
-dropUntilDone walls = go HS.empty
+dropUntilDone :: (Walls -> Sands -> Sands) -> Walls -> Sands
+dropUntilDone dropper walls = go HS.empty
   where
     go :: Sands -> Sands
     go sands =
-        let newSands = dropSand walls sands
+        let newSands = dropper walls sands
         in if HS.size newSands == HS.size sands
             then sands
             else go newSands
@@ -74,17 +74,47 @@ dropSand walls = move (500, 0)
         lowest = HS.foldl' (\highest new -> max highest new) 0 . HS.map snd $ walls
 
         maybeMove :: (Int, Int) -> Maybe (Int, Int)
-        maybeMove (x, y) = tryPlace (x, y + 1) <|> tryPlace (x - 1, y + 1) <|> tryPlace (x + 1, y + 1)
+        maybeMove (x, y) =
+            tryPlace (x, y + 1)
+            <|> tryPlace (x - 1, y + 1)
+            <|> tryPlace (x + 1, y + 1)
 
         tryPlace :: (Int, Int) -> Maybe (Int, Int)
         tryPlace point
             | point `HS.member` walls || point `HS.member` sands = Nothing
             | otherwise = Just point
 
+dropSand2 :: Walls -> Sands -> Sands
+dropSand2 walls = move (500, 0)
+  where
+    move :: (Int, Int) -> Sands -> Sands
+    move curr sands = case maybeMove curr of
+        Just new -> move new sands
+        Nothing -> HS.insert curr sands
+      where
+        maybeMove :: (Int, Int) -> Maybe (Int, Int)
+        maybeMove (x, y) =
+            tryPlace (x, y + 1)
+            <|> tryPlace (x - 1, y + 1)
+            <|> tryPlace (x + 1, y + 1)
+
+        tryPlace :: (Int, Int) -> Maybe (Int, Int)
+        tryPlace point
+            | or @[]
+                [ point `HS.member` walls
+                , point `HS.member` sands
+                , snd point >= lowest + 2
+                ]
+                = Nothing
+            | otherwise = Just point
+
+        lowest :: Int
+        lowest = HS.foldl' (\highest new -> max highest new) 0 . HS.map snd $ walls
+
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = SR . HS.size . dropUntilDone . allWalls . partialParseText inputP
+solve1 = SR . HS.size . dropUntilDone dropSand . allWalls . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR . HS.size . dropUntilDone dropSand2 . allWalls . partialParseText inputP
