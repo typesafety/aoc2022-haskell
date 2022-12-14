@@ -11,7 +11,6 @@ import Control.Monad.State.Strict qualified as State
 import Data.Foldable qualified as Foldable
 import Data.List qualified as List
 import Data.Sequence qualified as Seq
-import System.IO.Unsafe (unsafePerformIO)
 
 import Text.Megaparsec qualified as P
 import Text.Megaparsec.Char qualified as P

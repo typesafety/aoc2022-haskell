@@ -12,6 +12,7 @@ module Prelube (
     module Data.Char,
     module Data.Coerce,
     module Data.HashMap.Strict,
+    module Data.HashSet,
     module Data.Functor,
     module Data.IntMap.Strict,
     module Data.Kind,
@@ -21,6 +22,7 @@ module Prelube (
     module Data.Text,
     module Data.Void,
     module Debug.Pretty.Simple,
+    module System.IO.Unsafe,
     module TextShow,
 ) where
 
@@ -61,6 +63,7 @@ import Data.Char (digitToInt)
 import Data.Coerce (coerce)
 import Data.Functor ((<&>))
 import Data.HashMap.Strict (HashMap)
+import Data.HashSet (HashSet)
 import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
 import Data.List qualified as List
@@ -71,6 +74,7 @@ import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
 import Data.Void (Void)
+import System.IO.Unsafe (unsafePerformIO)
 import Unsafe.Coerce (unsafeCoerce)
 
 import Debug.Pretty.Simple (
