@@ -2,7 +2,7 @@ module Solutions.Day13 where
 
 import Prelube
 
-import Data.Foldable qualified as Foldable
+import Data.List qualified as List
 
 import Text.Megaparsec qualified as P
 import Text.Megaparsec.Char qualified as P
@@ -34,10 +34,19 @@ pairP = (,) <$> rowP <*> rowP
 inputP :: Parser (NonEmpty (Item, Item))
 inputP = partialNonEmpty <$> P.someTill (pairP <* P.optional P.eol) P.eof
 
+part2P :: Parser (NonEmpty Item)
+part2P = partialNonEmpty <$> P.someTill (rowP <* P.optional P.eol) P.eof
+
 -- * Solve
 
 data Trool = Yes | No | Idk
     deriving (Eq, Show)
+
+instance Ord Item where
+    compare x y = case cmpItems x y of
+        Yes -> LT
+        No  -> GT
+        Idk -> EQ
 
 cmpItems :: Item -> Item -> Trool
 cmpItems l r = case (l, r) of
@@ -63,12 +72,25 @@ cmpItems l r = case (l, r) of
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
 solve1 = SR
-    . Foldable.foldl' (\acc t -> acc + fst t) 0
+    . List.foldl' (\acc t -> acc + fst t) 0
     . filter ((Yes ==) . snd)
     . zip ([1 ..] :: NonEmpty Int)
     . fmap (uncurry cmpItems)
     . partialParseText inputP
 
+
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . partialFromJust
+    . (\xs ->
+        (*) <$> List.findIndex (== divider1) xs
+            <*> List.findIndex (== divider2) xs)
+    . (IInt 69 : )
+    . toList
+    . sort
+    . (<> [divider1, divider2])
+    . partialParseText part2P
+  where
+    divider1 = IList [IList [IInt 2]]
+    divider2 = IList [IList [IInt 6]]
