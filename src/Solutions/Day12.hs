@@ -7,6 +7,7 @@ import Data.Foldable qualified as Foldable
 import Data.HashMap.Strict qualified as HM
 import Data.HashSet qualified as HS
 import Data.List qualified as List
+import Data.Maybe (catMaybes)
 import Data.Sequence qualified as Seq
 
 import Text.Megaparsec qualified as P
@@ -36,29 +37,28 @@ inputP = do ------------------- \-- \
                                 $ List.zip [0 ..] rows --- \___
 -------------------------------------------------------------- |
 
-bfs :: DGraph (Char, (Int, Int)) -> Seq (Int, Int)
+bfs :: DGraph (Char, (Int, Int)) -> Maybe (Seq (Int, Int))
 bfs dg@(Node (_, startC) _) = State.evalState (go [([], dg)]) (HS.singleton startC)
   where
-    go :: [(Seq (Int, Int), DGraph (Char, (Int, Int)))] -> State (HashSet (Int, Int)) (Seq (Int, Int))
+    go :: [(Seq (Int, Int), DGraph (Char, (Int, Int)))] -> State (HashSet (Int, Int)) (Maybe (Seq (Int, Int)))
     go paths = do
         newPaths <- mconcat <$> mapM step paths
         
-        case Foldable.find (\(_, Node (c, p) _) -> c == 'E') paths of
-            Just (ps, Node (_, p) _) -> pure (ps |> p)
-            Nothing -> go newPaths
+        case Foldable.find (\(_, Node (c, _) _) -> c == 'E') paths of
+            Just (ps, Node (_, p) _) -> pure (Just (ps |> p))
+            Nothing
+                | newPaths == paths -> pure Nothing  -- Got stuck
+                | otherwise -> go newPaths
 
     step :: (Seq (Int, Int), DGraph (Char, (Int, Int)))
         -> State (HashSet (Int, Int)) [(Seq (Int, Int), DGraph (Char, (Int, Int)))]
-    step (path, Node (c, xy) ngs) = do
+    step (path, Node (_, xy) ngs) = do
         visited <- State.get
 
         let neighsToVisit = List.filter (\(Node (_, p) _) -> not (p `HS.member` visited)) ngs
 
         forM_ neighsToVisit $ \(Node (_, p) _) -> State.modify' (HS.insert p)
         pure $ fmap (path |> xy, ) neighsToVisit
-
-neighbors :: DGraph (Char, (Int, Int)) -> [(Char, (Int, Int))]
-neighbors (Node _ ngs) = fmap nodeData ngs
 
 nodeData :: DGraph (Char, (Int, Int)) -> (Char, (Int, Int))
 nodeData (Node x _) = x
@@ -93,13 +93,29 @@ startCoords = HM.foldlWithKey' (\acc coords c -> if c == 'S' then coords else ac
 endCoords :: HeightMap -> (Int, Int)
 endCoords = HM.foldlWithKey' (\acc coords c -> if c == 'E' then coords else acc) (0, 0)
 
--- allStartCoords :: HeightMap -> [(Int, Int)]
--- allStartCoords = HM.keys . HM.filter (`elem` ("aS" :: String))
+allStartCoords :: HeightMap -> [(Int, Int)]
+allStartCoords = HM.keys . HM.filter (`elem` ("aS" :: String))
+
+allGraphs :: [(Int, Int)] -> HeightMap -> [DGraph (Char, (Int, Int))]
+allGraphs starts hm = fmap (flip buildGraph hm) starts
 
 -- | Solve part 1.
 solve1 :: Text -> SolverResult
-solve1 = SR . decr . Seq.length . bfs . (\hm -> buildGraph (startCoords hm) hm) . partialParseText inputP
+solve1 = SR
+    . decr
+    . Seq.length
+    . partialFromJust
+    . bfs
+    . (\hm -> buildGraph (startCoords hm) hm)
+    . partialParseText inputP
 
 -- | Solve part 2.
 solve2 :: Text -> SolverResult
-solve2 = todo
+solve2 = SR
+    . List.minimum
+    . fmap (decr . List.length)
+    . catMaybes
+    . Foldable.toList
+    . fmap bfs
+    . (\hm -> allGraphs (allStartCoords hm) hm)
+    . partialParseText inputP
