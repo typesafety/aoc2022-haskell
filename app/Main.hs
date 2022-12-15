@@ -17,6 +17,7 @@ import Solutions.Day10 qualified as D10
 import Solutions.Day11 qualified as D11
 import Solutions.Day12 qualified as D12
 import Solutions.Day14 qualified as D14
+import Solutions.Day15 qualified as D15
 
 
 main :: IO ()
@@ -67,4 +68,6 @@ pickSolver = \case
     Input 12 2 _ -> Just (D12.solve2)
     Input 14 1 _ -> Just (D14.solve1)
     Input 14 2 _ -> Just (D14.solve2)
+    Input 15 1 _ -> Just (D15.solve1)
+    Input 15 2 _ -> Just (D15.solve2)
     _ -> Nothing
