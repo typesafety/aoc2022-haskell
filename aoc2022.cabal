@@ -48,6 +48,7 @@ library
         Solutions.Day13
         Solutions.Day14
         Solutions.Day15
+        Solutions.Day16
 
     other-modules:
 
