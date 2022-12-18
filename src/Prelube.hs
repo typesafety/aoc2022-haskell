@@ -5,15 +5,17 @@
 module Prelube (
     module PreludeLess,
     module Prelube,
+
     module Control.Applicative,
     module Control.Monad,
+    module Control.Monad.Reader,
     module Control.Monad.State.Strict,
     module Data.Bifunctor,
     module Data.Char,
     module Data.Coerce,
+    module Data.Functor,
     module Data.HashMap.Strict,
     module Data.HashSet,
-    module Data.Functor,
     module Data.IntMap.Strict,
     module Data.Kind,
     module Data.List.NonEmpty,
@@ -21,12 +23,15 @@ module Prelube (
     module Data.Sequence,
     module Data.Text,
     module Data.Void,
-    module Debug.Pretty.Simple,
+    module Debug.Trace,
     module System.IO.Unsafe,
+
+    module Debug.Pretty.Simple,
     module TextShow,
 ) where
 
 import Prelude as PreludeLess hiding (
+    -- Hide functions on lists by defaultin favor of NonEmpty variants.
     break,
     cycle,
     drop,
@@ -56,8 +61,9 @@ import Prelude as PreludeLess hiding (
  )
 
 import Control.Applicative ((<|>))
-import Control.Monad ((>=>), (<=<), when, forM_, void, replicateM_)
-import Control.Monad.State.Strict (State)
+import Control.Monad ((>=>), (<=<), when, forM_, forM,void, replicateM_)
+import Control.Monad.Reader (Reader, ReaderT)
+import Control.Monad.State.Strict (State, StateT)
 import Data.Bifunctor
 import Data.Char (digitToInt)
 import Data.Coerce (coerce)
@@ -74,6 +80,16 @@ import Data.Text (Text)
 import Data.Text qualified as Txt
 import Data.Text.IO qualified as Txt
 import Data.Void (Void)
+import Debug.Trace (
+    trace,
+    traceIO,
+    traceId,
+    traceM,
+    traceShow,
+    traceShowId,
+    traceShowM,
+ )
+import GHC.Stack (HasCallStack)
 import System.IO.Unsafe (unsafePerformIO)
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -86,16 +102,16 @@ import Debug.Pretty.Simple (
     pTraceShowId,
     pTraceShowM,
  )
-import GHC.Stack (HasCallStack)
 import Text.Megaparsec qualified as P
 import TextShow hiding (singleton)
+
 
 -- * Glue
 
 data SolverResult :: Type where
     SR :: TextShow a => a -> SolverResult
 
--- | Convert a showtSR to a Text.
+-- | Convert a SolverResult to a Text.
 showtSR :: SolverResult -> Text
 showtSR (SR t) = showt t
 
@@ -148,7 +164,7 @@ applyN :: Int -> (a -> a) -> a -> a
 applyN n f = List.foldl' (.) id (replicate n f)
 
 -- | n - 1
-decr :: Int -> Int
+decr :: Integral a => a -> a
 decr n = n - 1
 
 -- * Placeholders
